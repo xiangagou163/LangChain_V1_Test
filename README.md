@@ -38,5 +38,8 @@ LangSmith 提供 trace、评测和对比试验工具，帮助团队在 prompt/�
       
 ## 视频合集:
 
-
+1. 2026 必学！LangChain 最新 V1.x 版本全家桶 LangChain + LangGraph + DeepAgents 开发经验免费开源分享
+开源项目整体介绍     
+https://youtu.be/W1js-VzhyiU     
+https://www.bilibili.com/video/BV17c6mBbEHv/      
 
