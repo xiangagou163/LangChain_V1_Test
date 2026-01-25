@@ -71,4 +71,10 @@ https://www.bilibili.com/video/BV1DsrUBREsL/
 7. 【EP06_人工介入审查 HITL】2026必学！LangChain最新V1.x全家桶LangChain+LangGraph+DeepAgents分享      
 https://youtu.be/hO2vNz_0mSs       
 https://www.bilibili.com/video/BV191zzBaEjm/       
-对应文件夹:06_XXX      
+对应文件夹:06_XXX
+
+8. 【EP07_检索增强生成 RAG】2026必学！LangChain最新V1.x全家桶LangChain+LangGraph+DeepAgents分享        
+https://youtu.be/xaxbaeMT0c0        
+https://www.bilibili.com/video/BV18jzrBcEY3/         
+对应文件夹:07_XXX
+
