@@ -78,3 +78,6 @@ https://youtu.be/xaxbaeMT0c0
 https://www.bilibili.com/video/BV18jzrBcEY3/         
 对应文件夹:07_XXX
 
+9. 【EP08_自定义MCP Server】2026必学！LangChain最新V1.x全家桶LangChain+LangGraph+DeepAgents分享    
+https://youtu.be/Q9tJ5EY5-1Y      
+对应文件夹:08_XXX   
