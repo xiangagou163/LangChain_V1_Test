@@ -81,4 +81,14 @@ https://www.bilibili.com/video/BV18jzrBcEY3/
 9. 【EP08_自定义MCP Server】2026必学！LangChain最新V1.x全家桶LangChain+LangGraph+DeepAgents分享    
 https://youtu.be/Q9tJ5EY5-1Y      
 https://www.bilibili.com/video/BV1g3zDBxEUx/   
-对应文件夹:08_XXX   
+对应文件夹:08_XXX
+
+10. 【EP09_集成Langfuse服务】打造可观测可评估的Agent应用，从本地部署到观测评估的保姆级完整闭环攻略。可观测性、Prompt管理与评估一站式集成方案
+（1）核心功能介绍和平台功能演示：          
+https://youtu.be/WBaTb58E8Q4      
+对应文件夹:09_XXX    
+
+
+
+
+
