@@ -92,7 +92,9 @@ https://youtu.be/Guvuf_xxdG0
 https://www.bilibili.com/video/BV13a6vBSEVT/               
 对应文件夹:09_XXX      
 
-
-
+11. 【EP10_集成Milvus向量数据库】打造真正理解业务逻辑的企业级RAG应用，从服务本地部署、知识库构建、混合搜索、MCP到Agent调用的完整保姆级闭环攻略               
+https://youtu.be/WBaTb58E8Q4             
+https://youtu.be/1CCslws1mkA                
+对应文件夹:10_XXX      
 
 
