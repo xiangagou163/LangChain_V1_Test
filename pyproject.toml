@@ -3,4 +3,9 @@ name = "langchain-v1-test"
 version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "concurrent-log-handler==0.9.28",
+    "langchain==1.2.1",
+    "langchain-openai==1.1.6",
+    "socksio==1.0.0",
+]

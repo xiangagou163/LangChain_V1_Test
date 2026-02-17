@@ -14,7 +14,7 @@ class Config:
     if not os.path.exists(os.path.dirname(LOG_FILE)):
         os.makedirs(os.path.dirname(LOG_FILE))
     # 配置单个日志文件的最大字节数（这里是 5MB），通常用于配合轮转日志处理
-    MAX_BYTES = 5*1024*1024,
+    MAX_BYTES = 5*1024*1024
     # 配置日志轮转时最多保留的备份文件数量，这里设置为保留 3 个历史日志文件
     BACKUP_COUNT = 3
 

@@ -95,6 +95,6 @@ response = agent.invoke(
 )
 
 # 打印第二次调用的结构化响应内容
-print(f"Agent最终回复是: {response['structured_response']} \n")
+print(f"Agent第二次最终回复是: {response['structured_response']} \n")
 # 通过日志记录器记录第二轮对话的 structured_response 结果
-logger.info(f"Agent最终回复是: : {response['structured_response']}")
+logger.info(f"Agent第二次最终回复是: : {response['structured_response']}")
