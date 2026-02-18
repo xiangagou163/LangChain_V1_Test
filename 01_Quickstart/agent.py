@@ -63,7 +63,7 @@ agent = create_agent(
     system_prompt=SYSTEM_PROMPT,
     tools=tools,
     context_schema=Context,
-    response_format=ToolStrategy(ResponseFormat),
+    response_format=ResponseFormat,
     checkpointer=checkpointer
 )
 

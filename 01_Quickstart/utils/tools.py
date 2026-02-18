@@ -16,9 +16,9 @@ logger = LoggerManager.get_logger()
 # 定义一个函数，用于构建并返回当前 Agent 可用的工具列表
 def get_tools():
 
-    # 使用 @tool 装饰器注册一个工具，工具名为 "list_refund_reasons"，描述为“为指定的城市获取天气。”
+    # 使用 @tool 装饰器注册一个工具，工具名为 "get_weather_for_location"，描述为“为指定的城市获取天气。”
     # 该工具接收城市名称，并返回该城市的天气描述字符串
-    @tool("list_refund_reasons", description="为指定的城市获取天气。")
+    @tool("get_weather_for_location", description="为指定的城市获取天气。")
     def get_weather_for_location(city: str) -> str:
         # 根据传入的城市名返回一个固定的晴天描述（此处为示例逻辑，未实际调用天气 API）
         return f"{city}的天气是晴天!"
