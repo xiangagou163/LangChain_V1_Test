@@ -1,4 +1,5 @@
 langchain==1.2.1
 langchain-openai==1.1.6
 concurrent-log-handler==0.9.28
+langgraph-checkpoint-postgres==3.0.4
 socksio==1.0.0
