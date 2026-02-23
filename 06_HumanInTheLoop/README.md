@@ -110,4 +110,4 @@ python agent_invoke_hitl.py
 python agent_stream_hitl.py
 ```
 
-{'city': '南京'}          
+{"city": "杭州"}          

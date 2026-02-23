@@ -1,9 +1,9 @@
 # 导入操作系统模块，用于读取环境变量或进行其他与操作系统相关的配置
 import os
-# 从 langchain_openai 包中导入 ChatOpenAI 和 OpenAIEmbeddings
-# ChatOpenAI：用于与 OpenAI 的对话类模型交互
-# OpenAIEmbeddings：用于调用 OpenAI 的向量/嵌入模型生成文本向量表示
-from langchain_openai import ChatOpenAI,OpenAIEmbeddings
+# 从 langchain_openai 包中导入 ChatOpenAI，用于与 OpenAI 的对话类模型交互
+from langchain_openai import ChatOpenAI
+# 从 langchain_huggingface 包中导入 HuggingFaceEmbeddings，用于本地向量嵌入
+from langchain_huggingface import HuggingFaceEmbeddings
 # 从当前包中导入 LoggerManager，用于获取日志记录器实例以输出运行和调试信息
 from .logger import LoggerManager
 
@@ -33,7 +33,7 @@ MODEL_CONFIGS = {
         # oneapi 服务的基础 URL
         "base_url": "http://139.224.72.218:3000/v1",
         # oneapi 的访问密钥
-        "api_key": "YOUR_ONEAPI_KEY_HERE",
+        "api_key": "sk-GseYmJ8pX1D0I004W7a43506e8f1231234233C44B724FfD66aD9",
         # 对话模型名称
         "chat_model": "qwen-max",
         # 向量嵌入模型名称
@@ -44,7 +44,7 @@ MODEL_CONFIGS = {
         # DashScope 兼容模式的基础 URL
         "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
         # DashScope 的 API Key
-        "api_key": "YOUR_QWEN_API_KEY_HERE",
+        "api_key": "sk-f718953877a84432436888b43b1bd8843026e2e5",
         # 对话模型名称
         "chat_model": "qwen-turbo-latest",
         # 向量嵌入模型名称
@@ -77,7 +77,7 @@ class LLMInitializationError(Exception):
 
 
 # 定义函数用于初始化 LLM 与 Embedding 实例，并返回二者
-def initialize_llm(llm_type: str = DEFAULT_LLM_TYPE) -> tuple[ChatOpenAI, OpenAIEmbeddings]:
+def initialize_llm(llm_type: str = DEFAULT_LLM_TYPE) -> tuple[ChatOpenAI, HuggingFaceEmbeddings]:
     """
     初始化LLM实例
 
@@ -85,7 +85,7 @@ def initialize_llm(llm_type: str = DEFAULT_LLM_TYPE) -> tuple[ChatOpenAI, OpenAI
         llm_type (str): LLM类型，可选值为 'openai', 'oneapi', 'qwen', 'ollama'
 
     Returns:
-        ChatOpenAI: 初始化后的LLM实例
+        tuple[ChatOpenAI, HuggingFaceEmbeddings]: 对话模型和嵌入模型实例
 
     Raises:
         LLMInitializationError: 当LLM初始化失败时抛出
@@ -120,20 +120,14 @@ def initialize_llm(llm_type: str = DEFAULT_LLM_TYPE) -> tuple[ChatOpenAI, OpenAI
             max_retries=2
         )
 
-        # 创建向量嵌入模型实例
-        llm_embedding = OpenAIEmbeddings(
-            # 嵌入服务的基础 URL，与 chat 使用同一后端
-            base_url=config["base_url"],
-            # 访问嵌入服务的 API Key
-            api_key=config["api_key"],
-            # 嵌入模型名称
-            model=config["embedding_model"],
-            # 部署名称，一般与模型名保持一致
-            deployment=config["embedding_model"]
+        # 创建本地 HuggingFace 向量嵌入模型实例
+        # 使用多语言模型，支持中文
+        llm_embedding = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
         )
 
         # 记录成功初始化的日志，包含当前使用的 llm_type
-        logger.info(f"成功初始化 {llm_type} LLM")
+        logger.info(f"成功初始化 {llm_type} LLM 和 HuggingFace Embedding")
         # 返回对话模型和嵌入模型两个实例
         return llm_chat, llm_embedding
 

@@ -2,4 +2,8 @@ langchain==1.2.1
 langchain-openai==1.1.6
 concurrent-log-handler==0.9.28
 langgraph-checkpoint-postgres==3.0.4
+langchain-text-splitters==1.1.0
+langchain-community==0.4.1
+langchain-chroma==1.1.0
+pypdf==6.6.0
 socksio==1.0.0
