@@ -1,13 +1,14 @@
 # 导入操作系统模块，用于设置和读取环境变量
 import os
 import asyncio
+import sys
 # 导入 json 模块用于解析 JSON 字符串
 import json
 # 导入 Python 标准库的 uuid 模块，用来生成全局唯一ID
 import uuid
 # 从 LangChain 导入 create_agent 方法，用于创建智能体（Agent）
 from langchain.agents import create_agent
-# 这是一个“摘要中间件”，用于在对话过长时，
+# 这是一个"摘要中间件"，用于在对话过长时，
 # 自动用聊天模型对早期消息做摘要并替换原始消息，
 # 以此控制上下文长度、同时尽量保留历史关键信息
 from langchain.agents.middleware import SummarizationMiddleware
@@ -21,7 +22,7 @@ from psycopg_pool import AsyncConnectionPool
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 # 导入异步PostgreSQL存储器，用于长期记忆存储
 from langgraph.store.postgres import AsyncPostgresStore
-# 从 LangChain 导入 ToolStrategy，用于指定代理使用“工具调用”的结构化输出格式
+# 从 LangChain 导入 ToolStrategy，用于指定代理使用"工具调用"的结构化输出格式
 from langchain.agents.structured_output import ToolStrategy
 # Command 用于在中断后携带决策恢复执行
 from langgraph.types import Command
@@ -38,7 +39,7 @@ from utils.logger import LoggerManager
 
 
 
-# Author:@南哥AGI研习社 (B站 or YouTube 搜索“南哥AGI研习社”)
+# Author:@南哥AGI研习社 (B站 or YouTube 搜索"南哥AGI研习社")
 
 
 async def main():
@@ -92,6 +93,9 @@ async def main():
     # config：运行配置字典；context：上下文对象
     async def run_with_hitl_invoke(agent, user_content: str, config: dict, context: Context):
         # 第一次调用代理，发送用户消息，发起对话/执行
+        print("正在调用 Agent，请稍候...")
+        sys.stdout.flush()
+
         result = await agent.ainvoke(
             # 将用户输入包装为消息列表，角色为 user，内容为 user_content
             {"messages": [{"role": "user", "content": user_content}]},
@@ -100,6 +104,9 @@ async def main():
             # 传入上下文对象，维持对话或执行环境
             context=context,
         )
+
+        print("Agent 调用完成")
+        sys.stdout.flush()
 
         # 使用循环持续处理所有中断情况
         # 只要返回结果中包含 "__interrupt__" 字段，就说明有人工审核步骤需要处理
@@ -127,16 +134,19 @@ async def main():
                 allowed = review_configs[i]["allowed_decisions"]
 
                 # 在控制台提示检测到需要人工审核的工具调用
-                print("\n=== 检测到工具调用需要审核 ===")
+                print(f"\n{'='*50}")
+                print(">>> 检测到工具调用需要审核 <<<")
+                print(f"{'='*50}")
                 # 打印工具名称
                 print(f"工具名：{name}")
                 # 打印工具调用参数
                 print(f"参数：{args}")
                 # 打印允许的决策类型列表
-                print(f"允许的决策类型：{allowed}")
+                print(f"允许的决策类型：{','.join(allowed)}")
+                sys.stdout.flush()
 
                 # 提示人工输入决策类型，并去掉前后空格
-                decision_type = input("请输入决策(approve/edit/reject)：").strip()
+                decision_type = input(">>> 请输入决策：").strip()
                 # 如果输入不在允许的决策列表中，则循环要求重新输入
                 while decision_type not in allowed:
                     decision_type = input(f"非法决策，请重新输入({','.join(allowed)})：").strip()
@@ -219,7 +229,8 @@ async def main():
                 hitl_middleware
             ],
             context_schema=Context,
-            response_format=ToolStrategy(ResponseFormat),
+            # 注意：移除 response_format 以避免超时问题
+            # response_format=ToolStrategy(ResponseFormat),
             checkpointer=checkpointer,
             store=store
         )
@@ -273,16 +284,19 @@ async def main():
             # 返回给上层一个简单的成功提示文案
             return "记忆存储成功"
 
-        # 写入长期记忆
-        await write_long_term_info("user_001", "南哥")
+        # 写入长期记忆（先检查是否已存在）
+        existing_memory = await read_long_term_info("user_001")
+        if not existing_memory:
+            await write_long_term_info("user_001", "南哥")
+            print("已写入长期记忆")
+        else:
+            print(f"长期记忆已存在: {existing_memory}")
 
-        # 定义调用配置，其中 configurable.thread_id 用于标识一段对话的唯一“线程 ID”
-        # configurable.user_id 用于标识唯一“用户 ID”
-        # 不同 thread_id 之间状态隔离，相同 thread_id 则共享对话上下文与短期记忆
-        # 不同 user_id 之间数据隔离，相同 user_id 则共享长期记忆
+        # 定义调用配置
+        # 注意：使用唯一的 thread_id 确保每次运行都是新的会话
         config = {
             "configurable": {
-                "thread_id": "94",
+                "thread_id": str(uuid.uuid4()),
                 "user_id": "user_001",
             }
         }
@@ -303,7 +317,7 @@ async def main():
         logger.info(f"用户的问题是: {human_msg.content}")
 
         # 调用 Agent 进行对话
-        # - messages: 传入用户消息列表，这里用户问“外面的天气怎么样？”
+        # - messages: 传入用户消息列表，这里用户问"外面的天气怎么样？"
         # - config: 传入包含 thread_id 的配置，用于绑定会话上下文
         # - context: 传入自定义的 Context 对象（如包含 user_id 等业务相关信息）
         # 使用带 HITL 审核的封装函数 run_with_hitl_invoke
