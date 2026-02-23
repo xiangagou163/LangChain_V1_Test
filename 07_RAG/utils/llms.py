@@ -115,7 +115,8 @@ def initialize_llm(llm_type: str = DEFAULT_LLM_TYPE) -> tuple[ChatOpenAI, Huggin
             # 控制模型输出的随机性，这里使用统一默认值
             temperature=DEFAULT_TEMPERATURE,
             # 设置单次调用的超时时间（秒），避免长时间阻塞
-            timeout=30,
+            # 增加 timeout 以支持复杂的 Agent 调用和结构化输出
+            timeout=120,
             # 设置失败时的最大重试次数，提高稳定性
             max_retries=2
         )

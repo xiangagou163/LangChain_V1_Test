@@ -1,5 +1,7 @@
 # 导入操作系统模块，用于设置和读取环境变量
 import os
+# 导入 sys 模块用于刷新 stdout
+import sys
 # 导入 json 模块用于解析 JSON 字符串
 import json
 # 导入 Python 标准库的 uuid 模块，用来生成全局唯一ID
@@ -87,14 +89,32 @@ chat_prompt = ChatPromptTemplate.from_messages([
 # config：运行配置字典；context：上下文对象
 def run_with_hitl_invoke(agent, user_content: str, config: dict, context: Context):
     # 第一次调用代理，发送用户消息，发起对话/执行
-    result = agent.invoke(
-        # 将用户输入包装为消息列表，角色为 user，内容为 user_content
-        {"messages": [{"role": "user", "content": user_content}]},
-        # 传入配置，用于控制代理行为
-        config=config,
-        # 传入上下文对象，维持对话或执行环境
-        context=context,
-    )
+    print("正在调用 Agent，请稍候...")
+    sys.stdout.flush()  # 强制刷新输出
+
+    # 设置超时监控
+    import threading
+    def timeout_warning():
+        print("\n[警告] Agent 调用已超过 30 秒，请耐心等待...")
+        sys.stdout.flush()
+
+    timer = threading.Timer(30, timeout_warning)
+    timer.start()
+
+    try:
+        result = agent.invoke(
+            # 将用户输入包装为消息列表，角色为 user，内容为 user_content
+            {"messages": [{"role": "user", "content": user_content}]},
+            # 传入配置，用于控制代理行为
+            config=config,
+            # 传入上下文对象，维持对话或执行环境
+            context=context,
+        )
+    finally:
+        timer.cancel()
+
+    print("Agent 调用完成")
+    sys.stdout.flush()
 
     # 使用循环持续处理所有中断情况
     # 只要返回结果中包含 "__interrupt__" 字段，就说明有人工审核步骤需要处理
@@ -122,19 +142,22 @@ def run_with_hitl_invoke(agent, user_content: str, config: dict, context: Contex
             allowed = review_configs[i]["allowed_decisions"]
 
             # 在控制台提示检测到需要人工审核的工具调用
-            print("\n=== 检测到工具调用需要审核 ===")
+            print(f"\n{'='*50}")
+            print(">>> 检测到工具调用需要审核 <<<")
+            print(f"{'='*50}")
             # 打印工具名称
             print(f"工具名：{name}")
             # 打印工具调用参数
             print(f"参数：{args}")
             # 打印允许的决策类型列表
-            print(f"允许的决策类型：{allowed}")
+            print(f"允许的决策类型：{','.join(allowed)}")
+            sys.stdout.flush()  # 强制刷新输出，确保提示可见
 
             # 提示人工输入决策类型，并去掉前后空格
-            decision_type = input("请输入决策(approve/edit/reject)：").strip()
+            decision_type = input(">>> 请输入决策：").strip()
             # 如果输入不在允许的决策列表中，则循环要求重新输入
             while decision_type not in allowed:
-                decision_type = input(f"非法决策，请重新输入({','.join(allowed)})：").strip()
+                decision_type = input(f">>> 非法决策，请重新输入({','.join(allowed)})：").strip()
 
             # 如果决策为 edit，表示需要修改工具调用的参数
             if decision_type == "edit":
@@ -159,6 +182,8 @@ def run_with_hitl_invoke(agent, user_content: str, config: dict, context: Contex
 
         # 带着上一步收集的 decisions 信息恢复代理执行
         # Command(resume=...) 告诉代理根据这些人工决策继续往下跑
+        print("\n正在恢复 Agent 执行...")
+        sys.stdout.flush()
         result = agent.invoke(
             Command(resume={"decisions": decisions}),
             config=config,
@@ -198,7 +223,8 @@ with (
             hitl_middleware
         ],
         context_schema=Context,
-        response_format=ToolStrategy(ResponseFormat),
+        # 注意：暂时移除 response_format 以避免超时问题
+        # response_format=ToolStrategy(ResponseFormat),
         checkpointer=checkpointer,
         store=store
     )
@@ -252,8 +278,13 @@ with (
         # 返回给上层一个简单的成功提示文案
         return "记忆存储成功"
 
-    # 写入长期记忆
-    write_long_term_info("user_001", "南哥")
+    # 写入长期记忆（先检查是否已存在）
+    existing_memory = read_long_term_info("user_001")
+    if not existing_memory:
+        write_long_term_info("user_001", "南哥")
+        print("已写入长期记忆")
+    else:
+        print(f"长期记忆已存在: {existing_memory}")
 
     # 定义调用配置，其中 configurable.thread_id 用于标识一段对话的唯一“线程 ID”
     # configurable.user_id 用于标识唯一“用户 ID”
