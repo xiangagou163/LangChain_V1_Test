@@ -99,7 +99,10 @@ def get_tools():
              'allowed_decisions': ['approve', 'edit', 'reject'],
              'description': '调用 get_user_location 工具需要人工审批。请输入 approve(同意)、reject(拒绝) 或 edit(编辑参数)'
          },
-        'retrieve_context': False,
+        'retrieve_context': {
+            'allowed_decisions': ['approve', 'edit', 'reject'],
+            'description': '调用 retrieve_context 工具需要人工审批。请输入 approve(同意)、reject(拒绝) 或 edit(编辑参数)'
+        },
     }
     logger.info(f"需要人工审批的工具有：{interrupt_on}")
 

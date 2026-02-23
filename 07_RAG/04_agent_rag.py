@@ -8,7 +8,7 @@ import json
 import uuid
 # 从 LangChain 导入 create_agent 方法，用于创建智能体（Agent）
 from langchain.agents import create_agent
-# 这是一个“摘要中间件”，用于在对话过长时，
+# 这是一个"摘要中间件"，用于在对话过长时，
 # 自动用聊天模型对早期消息做摘要并替换原始消息，
 # 以此控制上下文长度、同时尽量保留历史关键信息
 from langchain.agents.middleware import SummarizationMiddleware
@@ -20,7 +20,7 @@ from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
 from langgraph.checkpoint.postgres import PostgresSaver
 # 从 langgraph 的 Postgres 存储模块中导入 PostgresStore 类，用于把长期记忆/状态持久化到 PostgreSQL 数据库中
 from langgraph.store.postgres import PostgresStore
-# 从 LangChain 导入 ToolStrategy，用于指定代理使用“工具调用”的结构化输出格式
+# 从 LangChain 导入 ToolStrategy，用于指定代理使用"工具调用"的结构化输出格式
 from langchain.agents.structured_output import ToolStrategy
 # Command 用于在中断后携带决策恢复执行
 from langgraph.types import Command
@@ -37,7 +37,7 @@ from utils.logger import LoggerManager
 
 
 
-# Author:@南哥AGI研习社 (B站 or YouTube 搜索“南哥AGI研习社”)
+# Author:@南哥AGI研习社 (B站 or YouTube 搜索"南哥AGI研习社")
 
 
 # # 设置 LangSmith 相关环境变量，开启 LangChain V2 版链路追踪，用于观测与调试 Agent 执行过程
@@ -286,13 +286,11 @@ with (
     else:
         print(f"长期记忆已存在: {existing_memory}")
 
-    # 定义调用配置，其中 configurable.thread_id 用于标识一段对话的唯一“线程 ID”
-    # configurable.user_id 用于标识唯一“用户 ID”
-    # 不同 thread_id 之间状态隔离，相同 thread_id 则共享对话上下文与短期记忆
-    # 不同 user_id 之间数据隔离，相同 user_id 则共享长期记忆
+    # 定义调用配置
+    # 注意：使用唯一的 thread_id 确保每次运行都是新的会话，避免跳过 HITL 中断
     config = {
         "configurable": {
-            "thread_id": "90",
+            "thread_id": str(uuid.uuid4()),
             "user_id": "user_001",
         }
     }
@@ -313,7 +311,7 @@ with (
     logger.info(f"用户的问题是: {human_msg.content}")
 
     # 调用 Agent 进行对话
-    # - messages: 传入用户消息列表，这里用户问“外面的天气怎么样？”
+    # - messages: 传入用户消息列表，这里用户问"外面的天气怎么样？"
     # - config: 传入包含 thread_id 的配置，用于绑定会话上下文
     # - context: 传入自定义的 Context 对象（如包含 user_id 等业务相关信息）
     # 使用带 HITL 审核的封装函数 run_with_hitl_invoke
