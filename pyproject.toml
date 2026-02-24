@@ -5,6 +5,7 @@ description = "Add your description here"
 requires-python = ">=3.11"
 dependencies = [
     "concurrent-log-handler==0.9.28",
+    "deepagents>=0.3.3",
     "langchain==1.2.1",
     "langchain-chroma==1.1.0",
     "langchain-community==0.4.1",
@@ -19,4 +20,5 @@ dependencies = [
     "pypdf==6.6.0",
     "sentence-transformers>=5.2.3",
     "socksio==1.0.0",
+    "tavily-python>=0.7.21",
 ]
