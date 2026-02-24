@@ -28,7 +28,7 @@ MODEL_CONFIGS = {
         # 调用该服务所需的 API Key
         "api_key": "sk-any",
         # 对话模型名称
-        "chat_model": "gpt-5.2",
+        "chat_model": "glm-5",
         # 向量嵌入模型名称
         "embedding_model": "text-embedding-3-small"
     },
